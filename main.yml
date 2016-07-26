@@ -1,0 +1,11 @@
+- hosts: managers
+  become: True
+  become_user: root
+  roles:
+    - { role: docker-swarm, docker_role: 'manager' }
+
+- hosts: workers
+  become: True
+  become_user: root
+  roles:
+    - { role: docker-swarm, docker_role: 'worker' }

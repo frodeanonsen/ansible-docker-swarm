@@ -1,5 +1,0 @@
-- hosts: all
-  become: False
-  become_user: root
-  roles:
-    - docker

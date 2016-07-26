@@ -1,21 +1,21 @@
-marklee77.docker
-================
+ansible-docker-swarm
+====================
 
-Role to install Docker on various distributions, particularly Ubuntu, Debian,
-Fedora and CentOS. Debian distributions use the docker.io repository, while
-RedHat distributions use standard repositories.
+Role to set up a Docker Swarm Cluster on CentOS.
 
-This playbook is implemented using a common set of tasks customized by
-os-specific variables. This means that if there are multiple systems with
-different operating systems, docker will be installed in parallel rather than
-sequentially (as would be the case if using include: ... when: ...).
+This role can create both Docker Swarm manager and worker nodes.
+This is done using variables.
 
 Example Playbook
 -------------------------
 
-    - hosts: all
+    - hosts: managers
       roles:
-        - docker
+        - { role: docker-swarm, docker_role: 'manager' }
+
+    - hosts: workers
+      roles:
+        - { role: docker-swarm, docker_role: 'worker' }
 
 License
 -------
@@ -25,4 +25,4 @@ GPLv2
 Author Information
 ------------------
 
-http://stillwell.me
+oddgeir.gitlestad@gmail.com
