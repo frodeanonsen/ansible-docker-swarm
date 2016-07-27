@@ -2,8 +2,11 @@
 - name: Include stuff
   include_vars: vars/vars.yml
 
+- name: Add Docker test repo
+  yum_repository: name=docker-test.repo description='Docker test repo' baseurl=https://yum.dockerproject.org/repo/testing/centos/7 enabled=yes gpgcheck=yes gpgkey=https://yum.dockerproject.org/gpg
+
 - name: Install Docker
-  shell: curl -fsSL https://test.docker.com/ | sh creates=/usr/bin/docker
+  yum: name=docker-engine-1.12.0-0.4.rc4.el7.centos state=present
 
 - name: Start Docker service
   service: name=docker state=started enabled=yes
