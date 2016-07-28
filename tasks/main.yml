@@ -21,11 +21,18 @@
     state: latest
 
 - name: Initialize the swarm
-  shell: docker swarm init --secret {{ docker_swarm_secret }}
+  shell: "docker swarm init --secret {{ docker_swarm_secret }} --auto-accept worker,manager"
   ignore_errors: yes
+  run_once: yes
   when: docker_role == 'manager'
 
-- name: Join the swarm
+# This can be uncommented when Docker fixes their shit. Before that only one manager is supported
+#- name: Join the swarm as manager
+#  shell: docker swarm join --manager --secret {{ docker_swarm_secret }} --listen-addr {{ inventory_hostname }}:2377 10.1.43.2:2377 #Need to make this IP dynamic
+#  ignore_errors: yes
+#  when: docker_role == 'manager'
+
+- name: Join the swarm as worker
   shell: docker swarm join --secret {{ docker_swarm_secret }} 10.1.43.2:2377 #Need to make this IP dynamic
   ignore_errors: yes
   when: docker_role == 'worker'
