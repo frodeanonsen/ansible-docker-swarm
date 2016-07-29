@@ -4,9 +4,11 @@
 
 - name: Add Docker test repo
   yum_repository: name=docker-test.repo description='Docker test repo' baseurl=https://yum.dockerproject.org/repo/main/centos/7 enabled=yes gpgcheck=yes gpgkey=https://yum.dockerproject.org/gpg
+  when: ansible_os_family == "ReadHat"
 
 - name: Install Docker
   yum: name=docker-engine-1.12.0-1.el7.centos.x86_64 state=present
+  when: ansible_os_family == "ReadHat"
 
 - name: Start Docker service
   service: name=docker state=started enabled=yes
