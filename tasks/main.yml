@@ -3,10 +3,10 @@
   include_vars: vars/vars.yml
 
 - name: Add Docker test repo
-  yum_repository: name=docker-test.repo description='Docker test repo' baseurl=https://yum.dockerproject.org/repo/testing/centos/7 enabled=yes gpgcheck=yes gpgkey=https://yum.dockerproject.org/gpg
+  yum_repository: name=docker-test.repo description='Docker test repo' baseurl=https://yum.dockerproject.org/repo/main/centos/7 enabled=yes gpgcheck=yes gpgkey=https://yum.dockerproject.org/gpg
 
 - name: Install Docker
-  yum: name=docker-engine-1.12.0-0.4.rc4.el7.centos state=present
+  yum: name=docker-engine-1.12.0-1.el7.centos.x86_64 state=present
 
 - name: Start Docker service
   service: name=docker state=started enabled=yes
@@ -21,18 +21,30 @@
     state: latest
 
 - name: Initialize the swarm
-  shell: "docker swarm init --secret {{ docker_swarm_secret }} --auto-accept worker,manager"
+  shell: "docker swarm init --advertise-addr {{ inventory_hostname }}"
   ignore_errors: yes
   run_once: yes
   when: docker_role == 'manager'
 
+- name: Get worker token
+  shell: "docker swarm join-token -q worker"
+  register: worker_token
+  run_once: yes
+  when: docker_role == 'manager'
+
+- name: Get manager token
+  shell: "docker swarm join-token -q manager"
+  register: manager_token
+  run_once: yes
+  when: docker_role == 'manager'
+
 # This can be uncommented when Docker fixes their shit. Before that only one manager is supported
-#- name: Join the swarm as manager
-#  shell: docker swarm join --manager --secret {{ docker_swarm_secret }} --listen-addr {{ inventory_hostname }}:2377 10.1.43.2:2377 #Need to make this IP dynamic
-#  ignore_errors: yes
-#  when: docker_role == 'manager'
+- name: Join the swarm as manager
+  shell: docker swarm join --token {{ manager_token.stdout }} --advertise-addr {{ inventory_hostname }}:2377 10.1.43.2:2377 #Need to make this IP dynamic
+  ignore_errors: yes
+  when: docker_role == 'manager'
 
 - name: Join the swarm as worker
-  shell: docker swarm join --secret {{ docker_swarm_secret }} 10.1.43.2:2377 #Need to make this IP dynamic
+  shell: docker swarm join --token {{ worker_token.stdout }} 10.1.43.2:2377 #Need to make this IP dynamic
   ignore_errors: yes
   when: docker_role == 'worker'
