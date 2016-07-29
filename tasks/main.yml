@@ -14,7 +14,7 @@
   yum_repository: name=docker-test.repo description='Docker test repo' baseurl=https://yum.dockerproject.org/repo/main/centos/7 enabled=yes gpgcheck=yes gpgkey=https://yum.dockerproject.org/gpg
   when: ansible_os_family == "ReadHat"
 
-- name: Install deps
+- name: Install Debian deps
   apt: name=python,python-pip,curl,apt-transport-https,ca-certificates update_cache=yes
   when: ansible_os_family == "Debian"
 
@@ -28,10 +28,6 @@
 
 - name: Start Docker service
   service: name=docker state=started enabled=yes
-
-- name: ensure that pip is installed
-  shell: curl -s https://bootstrap.pypa.io/get-pip.py | python -
-         creates=/usr/bin/pip
 
 - name: ensure that docker-py client library has been installed via pip
   pip:
